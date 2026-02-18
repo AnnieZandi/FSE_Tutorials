@@ -20,9 +20,9 @@ def format_currency(amount: Decimal) -> str:
 
     Example:
         >>> format_currency(Decimal("1234.56"))
-        'R 1234.56'
+        'R 1,234.56'
     """
-    return ""
+    return f"{CURRENCY_SYMBOL} {amount:,.2f}"
 
 
 # TODO Implement the function below, if the transaction type is not valid raise a ValueError, if the amount is negative raise a ValueError
@@ -49,7 +49,20 @@ def add_transaction(
         >>> add_transaction(transactions, "Salary", Decimal("5000"), "income")
         [{'description': 'Salary', 'amount': Decimal('5000'), 'type': 'income'}]
     """
-    return transactions
+
+    if transaction_type not in TRANSACTION_TYPES: 
+        raise ValueError(f"Invalid transaction type:{transaction_type}. Must be 'income' or 'expense'.")
+    if amount < 0 : 
+        raise ValueError(f"Amount cannot be negative:{amount}. Please provide a positive value.")
+    
+   
+    item = {
+       "description": description,
+       "amount" : amount,
+       "type": transaction_type 
+   }
+    transactions.append(item)
+    return transactions 
 
 # TODO: Implement the function below
 def calculate_balance(transactions: List[dict]) -> Decimal:
@@ -72,7 +85,9 @@ def calculate_balance(transactions: List[dict]) -> Decimal:
         >>> calculate_balance(transactions)
         Decimal('4000')
     """
-    return Decimal(0)
+    balance = get_income_total(transactions) - get_expense_total(transactions)
+    return balance 
+    
 
 # TODO: Implement the function below
 def get_income_total(transactions: List[dict]) -> Decimal:
@@ -85,7 +100,11 @@ def get_income_total(transactions: List[dict]) -> Decimal:
     Returns:
         The total income as a Decimal.
     """
-    return Decimal(0)
+    total = Decimal(0)
+    for transaction in transactions: 
+        if transaction["type"] == "income": 
+            total += transaction["amount"]
+    return total
 
 # TODO: Implement the function below
 def get_expense_total(transactions: List[dict]) -> Decimal:
@@ -98,7 +117,12 @@ def get_expense_total(transactions: List[dict]) -> Decimal:
     Returns:
         The total expenses as a Decimal.
     """
-    return Decimal(0)
+    total = Decimal(0)
+    for transaction in transactions: 
+        if transaction["type"] == "expense": 
+            total += transaction["amount"] 
+    return total
+
 
 # TODO: Implement the function below
 # NOTE: If the balance exceeds the budget limit, return False and a message indicating overspend in a tuple
@@ -120,7 +144,11 @@ def check_budget(balance: Decimal, budget_limit: Decimal) -> Tuple[bool, str]:
         >>> check_budget(Decimal("1500"), Decimal("1000"))
         (False, 'Budget exceeded! Overspent by R 500.00.')
     """
-    return (True, "")
+    if balance <= budget_limit: 
+        return(True, f"Within budget. {format_currency(balance)}) of {format_currency(budget_limit)}.")
+    else:
+        overspend = balance - budget_limit 
+        return(False,f"Budget exceeded! Overspent by { format_currency(overspend)}.")
 
 # TODO: Implement the function below, however you see fit
 def display_transactions(transactions: List[dict]) -> None:
