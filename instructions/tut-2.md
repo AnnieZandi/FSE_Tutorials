@@ -54,8 +54,9 @@ This command will run all unit tests for the transactions module. You should see
 ### Step 6: Debug and Fix Issues
 
 If any tests fail:
-1. Read the error message carefully to understand what went wrong
-2. Review the corresponding test case in `tests/test_transactions.py`
+1. Read the error message carefully to under
+stand what went wrong 'tests/test_transactions.py'
+2. Review the corresponding test case in 
 3. Check your implementation logic
 4. Make corrections and run the tests again
 

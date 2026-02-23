@@ -5,7 +5,7 @@ from typing import List, Tuple
 # Constants
 CURRENCY_SYMBOL = "R"
 # TODO: Remove the TRANSACTION_TYPES constant below - we are not using it in the Transaction class
-TRANSACTION_TYPES = ["income", "expense"]
+
 
 
 class Transaction:
@@ -37,7 +37,12 @@ def calculate_total_expenses(transactions: List[Transaction]) -> Decimal:
         >>> calculate_total_expenses(transactions)
         Decimal('-2000.00')
     """
-    return Decimal(0)
+    run_total = Decimal(0) #expense 
+    for transaction in transactions:
+        if transaction.amount < 0: 
+            run_total += transaction.amount
+    return run_total 
+    
 
 
 # TODO: Implement this function to sum all transactions with positive amounts
@@ -50,7 +55,12 @@ def calculate_total_income(transactions: List[Transaction]) -> Decimal:
     Returns:
         The total income as a Decimal (should be positive).
     """
-    return Decimal(0)
+    run_total = Decimal(0) #Income
+    for transaction in transactions:
+        if transaction.amount > 0: 
+            run_total += transaction.amount
+    return run_total 
+
 
 # NOTE: This function is already complete - no changes needed here!
 def format_currency(amount: Decimal) -> str:
@@ -108,9 +118,6 @@ def add_transaction(
     transactions.append(transaction)
     return transactions
 
-# TODO: Update this function to work with Transaction objects instead of dicts.
-# Change List[dict] to List[Transaction], use dot notation (t.amount), and update docstring.
-# Hint: With Transaction objects, simply sum all amounts (expenses are negative, income is positive)!
 def calculate_balance(transactions: List[dict]) -> Decimal:
     """
     Calculate the current balance from a list of transactions.
@@ -131,17 +138,9 @@ def calculate_balance(transactions: List[dict]) -> Decimal:
         >>> calculate_balance(transactions)
         Decimal('4000')
     """
-    balance = Decimal(0)
-
-    for transaction in transactions:
-        if transaction["type"] == "income":
-            balance += transaction["amount"]
-        elif transaction["type"] == "expense":
-            balance -= transaction["amount"]
-
+    balance = Decimal(calculate_total_income(transactions) + calculate_total_expenses(transactions))
     return balance
 
-# TODO: Remove the entire get_income_total function below (replaced by calculate_total_income)
 def get_income_total(transactions: List[dict]) -> Decimal:
     """
     Calculate the total income from all transactions.
