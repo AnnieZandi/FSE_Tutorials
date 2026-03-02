@@ -1,4 +1,5 @@
 from loguru import logger
+from decimal import Decimal
 
 from transactions import Transaction, Category, calculate_financial_summary
 from database import get_session
@@ -41,7 +42,13 @@ def main():
 def add_entertainment_category():
     session = get_session()
     try:
-        pass
+        #Check if the entertainment category already exists 
+        category_exists = session.query(Category).filter_by(name="Entertainment").first()
+        if category_exists: 
+            return 
+        session.add(Category(name="Entertainment"))
+        session.commit()
+
     finally:
         session.close()
 
@@ -50,8 +57,27 @@ def add_entertainment_category():
 # NOTE: Fetch the Entertainment category first, then add two sample expenses linked to that category
 def add_entertainment_expenses():
     session = get_session()
-    try:
-        pass
+    try: 
+        #Step1:Check if the enternainment category exists 
+        entertainment_category = session.query(Category).filter_by(name="Entertainment").first()
+        #step 2 If it exists, add two sample expenses linked to that category 
+        if entertainment_category:
+           expense1 = Transaction(
+            date="2024-02-10",  
+            description="Movie Tickets",
+            amount= Decimal("-30.00"),
+            category_ref=entertainment_category 
+        )
+           expense2 = Transaction(
+            date="2024-02-15",  
+            description="Concert",
+            amount= Decimal("-100.00"),
+            category_ref=entertainment_category, 
+        )
+        session.add_all([expense1, expense2])
+        #step 3 Add the expenses to the session and commit
+        session.commit()
+        
     finally:
         session.close()
 
@@ -60,7 +86,15 @@ def add_entertainment_expenses():
 def display_transactions_by_category(category_name: str):
     session = get_session()
     try:
-        pass
+        # Fetch the category by name 
+        category = session.query(Category).filter_by(name=category_name).first()
+        if not category:
+            logger.warning(f"No category found with name '{category_name}'not found.")
+            return
+        transactions = session.query(Transaction).filter_by(category_id=category.id).all()
+        print(f"Transactions in category '{category_name}':") 
+        for transaction in transactions:
+            print(transaction)
     except Exception as e:
         logger.error(
             f"Error displaying transactions for category '{category_name}': {e}"
